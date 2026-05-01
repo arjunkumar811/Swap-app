@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { Token } from '@/types/token';
 import type { JupiterQuote } from '@/lib/jupiter';
+import { sanitizeSlippageBps } from '@/lib/jupiter/slippage';
 
 type SwapState = {
   inputToken?: Token;
@@ -30,7 +31,7 @@ export const useSwapStore = create<SwapState>((set) => ({
   setInputToken: (inputToken) => set({ inputToken }),
   setOutputToken: (outputToken) => set({ outputToken }),
   setAmount: (amount) => set({ amount }),
-  setSlippageBps: (slippageBps) => set({ slippageBps }),
+  setSlippageBps: (slippageBps) => set({ slippageBps: sanitizeSlippageBps(slippageBps), quote: undefined }),
   setQuote: (quote) => set({ quote }),
   setLoadingQuote: (loadingQuote) => set({ loadingQuote }),
   setSwapping: (swapping) => set({ swapping }),
