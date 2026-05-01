@@ -1,7 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRightLeft, ExternalLink, Copy } from 'lucide-react';
+import { ArrowRightLeft } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { toast } from 'sonner';
@@ -11,6 +11,7 @@ import SettingsPopover from './SettingsPopover';
 import TokenSelector from './swap/TokenSelector';
 import PriceImpactDisplay from './swap/PriceImpactDisplay';
 import RouteDisplay from './swap/RouteDisplay';
+import TransactionStatus from './swap/TransactionStatus';
 import { useTokenList } from '@/lib/jupiter/useTokenList';
 import { useQuote } from '@/lib/jupiter/useQuote';
 import { useSwapExecution } from '@/lib/jupiter/useSwapExecution';
@@ -92,14 +93,10 @@ export default function SwapCard() {
           <div className='flex justify-between'><span>Route</span><RouteDisplay quote={s.quote} loading={s.loadingQuote} /></div>
         </div>
         <SwapButton onClick={onSwap} disabled={!connected || !s.quote || s.swapping || s.loadingQuote} loading={s.swapping} />
-        <AnimatePresence>
-          {s.txid && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className='rounded-xl border border-teal-400/30 bg-teal-400/10 p-3 text-xs'>
-              <div className='mb-2 text-teal-200'>Transaction confirmed</div>
-              <div className='flex items-center gap-2'>
-                <button onClick={() => navigator.clipboard.writeText(s.txid!)} className='rounded bg-white/10 p-1'><Copy size={14} /></button>
-                <a className='inline-flex items-center gap-1 text-teal-200 hover:underline' href={`https://solscan.io/tx/${s.txid}`} target='_blank'>View <ExternalLink size={12} /></a>
-              </div>
+        <AnimatePresence mode='wait'>
+          {s.txStatus !== 'idle' && (
+            <motion.div key={s.txStatus + (s.txid ?? '')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <TransactionStatus status={s.txStatus} txid={s.txid} error={s.txError} />
             </motion.div>
           )}
         </AnimatePresence>

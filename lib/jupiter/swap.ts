@@ -18,6 +18,7 @@ export type SwapExecutionParams = {
   userPublicKey: string;
   signTransaction: (transaction: VersionedTransaction) => Promise<VersionedTransaction>;
   wrapAndUnwrapSol?: boolean;
+  onStatus?: (status: 'signing' | 'submitting' | 'confirming') => void;
 };
 
 export async function createSwapTransaction(
@@ -78,11 +79,14 @@ export async function executeJupiterSwap(params: SwapExecutionParams): Promise<{
     throw new JupiterApiError('Unable to deserialize swap transaction', { details: error });
   }
 
+  params.onStatus?.('signing');
   const signed = await params.signTransaction(tx);
+  params.onStatus?.('submitting');
   const signature = await params.connection.sendRawTransaction(signed.serialize(), {
     skipPreflight: false,
     maxRetries: 2
   });
+  params.onStatus?.('confirming');
   await params.connection.confirmTransaction(signature, 'confirmed');
   return { signature };
 }

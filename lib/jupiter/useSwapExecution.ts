@@ -29,22 +29,28 @@ export function useSwapExecution(options?: UseSwapExecutionOptions) {
 
       try {
         s.setSwapping(true);
+        s.setTxError(undefined);
+        s.setTxStatus('signing');
         const { signature } = await executeJupiterSwap({
           connection,
           quote: s.quote,
           userPublicKey,
           signTransaction,
-          wrapAndUnwrapSol: true
+          wrapAndUnwrapSol: true,
+          onStatus: (status) => s.setTxStatus(status)
         });
         s.setTxid(signature);
+        s.setTxStatus('success');
         options?.onSuccess?.(signature);
       } catch (error) {
+        s.setTxStatus('error');
+        s.setTxError(getErrorMessage(error, 'Swap transaction failed'));
         options?.onError?.(getErrorMessage(error, 'Swap transaction failed'));
       } finally {
         s.setSwapping(false);
       }
     },
-    [s.quote, s.setSwapping, s.setTxid, options]
+    [s.quote, s.setSwapping, s.setTxid, s.setTxStatus, s.setTxError, options]
   );
 
   return { executeSwap };
