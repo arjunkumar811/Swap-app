@@ -45,12 +45,16 @@ export default function TokenSelector({
         className='mt-2 flex h-12 w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.03] px-4 py-2 text-left hover:bg-white/[0.06] disabled:cursor-not-allowed disabled:opacity-60'
       >
         <span className='text-lg font-semibold text-white/80'>
-          {selected ? `${selected.symbol} Â· ${selected.name}` : 'Select token'}
+          {selected ? `${selected.symbol} · ${selected.name}` : 'Select token'}
         </span>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className='fixed inset-0 z-40 bg-black/60' />
         <Dialog.Content className='fixed left-1/2 top-1/2 z-50 w-[92vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 rounded-3xl border border-blue-200/20 bg-[#08142a]/95 p-5 shadow-2xl'>
+          <Dialog.Title className='sr-only'>{label} token selector</Dialog.Title>
+          <Dialog.Description className='sr-only'>
+            Search and select a token by symbol, name, or mint address.
+          </Dialog.Description>
           <div className='mb-3 flex h-14 items-center gap-2 rounded-2xl border border-blue-100/20 bg-white/5 px-4'>
             <Search size={18} className='text-white/60' />
             <input

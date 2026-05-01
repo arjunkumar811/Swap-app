@@ -62,7 +62,6 @@ export default function SwapCard() {
   useEffect(() => {
     if (inputBalanceError) {
       s.setLastError(toSwapError(new Error(inputBalanceError), inputBalanceError, { code: 'BALANCE_FAILED', source: 'balance' }));
-      toast.error(inputBalanceError);
     }
   }, [inputBalanceError]);
 
