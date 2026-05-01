@@ -9,6 +9,7 @@ import AmountInput from './AmountInput';
 import WalletButton from './WalletButton';
 import SettingsPopover from './SettingsPopover';
 import TokenSelector from './swap/TokenSelector';
+import PriceImpactDisplay from './swap/PriceImpactDisplay';
 import { useTokenList } from '@/lib/jupiter/useTokenList';
 import { useQuote } from '@/lib/jupiter/useQuote';
 import { useSwapExecution } from '@/lib/jupiter/useSwapExecution';
@@ -85,7 +86,7 @@ export default function SwapCard() {
           <TokenSelector tokens={tokens} selected={s.outputToken} onSelect={s.setOutputToken} label='Buy' loading={searching} />
         </div>
         <div className='rounded-xl border border-white/10 bg-black/20 p-3 text-xs text-muted'>
-          <div className='flex justify-between'><span>Price impact</span><span>{s.quote ? `${(Number(s.quote.priceImpactPct) * 100).toFixed(2)}%` : '--'}</span></div>
+          <div className='flex justify-between'><span>Price impact</span><PriceImpactDisplay priceImpactPct={s.quote?.priceImpactPct} loading={s.loadingQuote} /></div>
           <div className='flex justify-between'><span>Slippage</span><span>{(s.slippageBps / 100).toFixed(2)}%</span></div>
           <div className='flex justify-between'><span>Route</span><span>{s.quote?.routePlan?.[0]?.swapInfo?.label || '--'}</span></div>
         </div>
