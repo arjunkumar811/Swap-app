@@ -3,16 +3,15 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRightLeft, ExternalLink, Copy } from 'lucide-react';
 import { useEffect, useMemo } from 'react';
-import { VersionedTransaction } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { toast } from 'sonner';
 import AmountInput from './AmountInput';
 import WalletButton from './WalletButton';
 import SettingsPopover from './SettingsPopover';
 import TokenSelector from './swap/TokenSelector';
-import { createSwapTx } from '@/lib/jupiter';
 import { useTokenList } from '@/lib/jupiter/useTokenList';
 import { useQuote } from '@/lib/jupiter/useQuote';
+import { useSwapExecution } from '@/lib/jupiter/useSwapExecution';
 import { useSwapStore } from '@/store/swapStore';
 import SwapButton from './SwapButton';
 
@@ -22,6 +21,10 @@ export default function SwapCard() {
   const { tokens, loading: searching, error: tokenListError, inputDefault, outputDefault } = useTokenList();
   const s = useSwapStore();
   useQuote({ onError: (message) => toast.error(message) });
+  const { executeSwap } = useSwapExecution({
+    onSuccess: () => toast.success('Swap confirmed'),
+    onError: (message) => toast.error(message)
+  });
 
   useEffect(() => {
     if (!inputDefault || !outputDefault) return;
@@ -40,18 +43,11 @@ export default function SwapCard() {
 
   async function onSwap() {
     if (!connected || !publicKey || !signTransaction) return toast.error('Connect wallet first');
-    if (!s.quote) return toast.error('No quote available');
-    try {
-      s.setSwapping(true);
-      const { swapTransaction } = await createSwapTx({ quoteResponse: s.quote, userPublicKey: publicKey.toBase58(), wrapAndUnwrapSol: true });
-      const tx = VersionedTransaction.deserialize(Buffer.from(swapTransaction, 'base64'));
-      const signed = await signTransaction(tx);
-      const sig = await connection.sendRawTransaction(signed.serialize(), { skipPreflight: false, maxRetries: 2 });
-      await connection.confirmTransaction(sig, 'confirmed');
-      s.setTxid(sig);
-      toast.success('Swap confirmed');
-    } catch { toast.error('Swap transaction failed'); }
-    finally { s.setSwapping(false); }
+    await executeSwap({
+      connection,
+      userPublicKey: publicKey.toBase58(),
+      signTransaction
+    });
   }
 
   return (
