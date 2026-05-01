@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import type { Token } from '@/types/token';
 import type { JupiterQuote } from '@/lib/jupiter';
 import { sanitizeSlippageBps } from '@/lib/jupiter/slippage';
+import type { SwapError } from '@/lib/jupiter/errors';
 
 type SwapState = {
   inputToken?: Token;
@@ -12,6 +13,7 @@ type SwapState = {
   txid?: string;
   txStatus: 'idle' | 'signing' | 'submitting' | 'confirming' | 'success' | 'error';
   txError?: string;
+  lastError?: SwapError;
   loadingQuote: boolean;
   swapping: boolean;
   setInputToken: (t: Token) => void;
@@ -24,6 +26,8 @@ type SwapState = {
   setTxid: (v?: string) => void;
   setTxStatus: (v: SwapState['txStatus']) => void;
   setTxError: (v?: string) => void;
+  setLastError: (v?: SwapError) => void;
+  clearLastError: () => void;
   flipTokens: () => void;
 };
 
@@ -33,15 +37,17 @@ export const useSwapStore = create<SwapState>((set) => ({
   txStatus: 'idle',
   loadingQuote: false,
   swapping: false,
-  setInputToken: (inputToken) => set({ inputToken, txStatus: 'idle', txError: undefined }),
-  setOutputToken: (outputToken) => set({ outputToken, txStatus: 'idle', txError: undefined }),
-  setAmount: (amount) => set({ amount, txStatus: 'idle', txError: undefined }),
-  setSlippageBps: (slippageBps) => set({ slippageBps: sanitizeSlippageBps(slippageBps), quote: undefined, txStatus: 'idle', txError: undefined }),
+  setInputToken: (inputToken) => set({ inputToken, txStatus: 'idle', txError: undefined, lastError: undefined }),
+  setOutputToken: (outputToken) => set({ outputToken, txStatus: 'idle', txError: undefined, lastError: undefined }),
+  setAmount: (amount) => set({ amount, txStatus: 'idle', txError: undefined, lastError: undefined }),
+  setSlippageBps: (slippageBps) => set({ slippageBps: sanitizeSlippageBps(slippageBps), quote: undefined, txStatus: 'idle', txError: undefined, lastError: undefined }),
   setQuote: (quote) => set({ quote }),
   setLoadingQuote: (loadingQuote) => set({ loadingQuote }),
   setSwapping: (swapping) => set({ swapping }),
   setTxid: (txid) => set({ txid }),
   setTxStatus: (txStatus) => set({ txStatus }),
   setTxError: (txError) => set({ txError }),
-  flipTokens: () => set((s) => ({ inputToken: s.outputToken, outputToken: s.inputToken, quote: undefined, txStatus: 'idle', txError: undefined }))
+  setLastError: (lastError) => set({ lastError }),
+  clearLastError: () => set({ lastError: undefined }),
+  flipTokens: () => set((s) => ({ inputToken: s.outputToken, outputToken: s.inputToken, quote: undefined, txStatus: 'idle', txError: undefined, lastError: undefined }))
 }));

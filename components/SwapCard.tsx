@@ -12,6 +12,8 @@ import TokenSelector from './swap/TokenSelector';
 import PriceImpactDisplay from './swap/PriceImpactDisplay';
 import RouteDisplay from './swap/RouteDisplay';
 import TransactionStatus from './swap/TransactionStatus';
+import SwapErrorAlert from './swap/SwapErrorAlert';
+import { toSwapError } from '@/lib/jupiter/errors';
 import { useTokenList } from '@/lib/jupiter/useTokenList';
 import { useQuote } from '@/lib/jupiter/useQuote';
 import { useSwapExecution } from '@/lib/jupiter/useSwapExecution';
@@ -34,7 +36,12 @@ export default function SwapCard() {
     owner: walletAddress,
     token: s.inputToken
   });
-  useQuote({ onError: (message) => toast.error(message) });
+  useQuote({
+    onError: (message) => {
+      s.setLastError(toSwapError(new Error(message), message, { code: 'QUOTE_FAILED', source: 'quote' }));
+      toast.error(message);
+    }
+  });
   const { executeSwap } = useSwapExecution({
     onSuccess: () => toast.success('Swap confirmed'),
     onError: (message) => toast.error(message)
@@ -47,10 +54,16 @@ export default function SwapCard() {
   }, [inputDefault?.address, outputDefault?.address]);
 
   useEffect(() => {
-    if (tokenListError) toast.error(tokenListError);
+    if (tokenListError) {
+      s.setLastError(toSwapError(new Error(tokenListError), tokenListError, { code: 'TOKEN_LIST_FAILED', source: 'tokens' }));
+      toast.error(tokenListError);
+    }
   }, [tokenListError]);
   useEffect(() => {
-    if (inputBalanceError) toast.error(inputBalanceError);
+    if (inputBalanceError) {
+      s.setLastError(toSwapError(new Error(inputBalanceError), inputBalanceError, { code: 'BALANCE_FAILED', source: 'balance' }));
+      toast.error(inputBalanceError);
+    }
   }, [inputBalanceError]);
 
   const outAmount = useMemo(() => {
@@ -59,7 +72,12 @@ export default function SwapCard() {
   }, [s.quote, s.outputToken]);
 
   async function onSwap() {
-    if (!connected || !publicKey || !signTransaction) return toast.error('Connect wallet first');
+    if (!connected || !publicKey || !signTransaction) {
+      const message = 'Connect wallet first';
+      s.setLastError(toSwapError(new Error(message), message, { code: 'WALLET_NOT_CONNECTED', source: 'wallet' }));
+      toast.error(message);
+      return;
+    }
     await executeSwap({
       connection,
       userPublicKey: publicKey.toBase58(),
@@ -93,6 +111,7 @@ export default function SwapCard() {
           <div className='flex justify-between'><span>Route</span><RouteDisplay quote={s.quote} loading={s.loadingQuote} /></div>
         </div>
         <SwapButton onClick={onSwap} disabled={!connected || !s.quote || s.swapping || s.loadingQuote} loading={s.swapping} />
+        <SwapErrorAlert error={s.lastError} onDismiss={s.clearLastError} />
         <AnimatePresence mode='wait'>
           {s.txStatus !== 'idle' && (
             <motion.div key={s.txStatus + (s.txid ?? '')} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
