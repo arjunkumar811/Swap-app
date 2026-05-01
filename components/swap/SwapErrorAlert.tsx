@@ -11,7 +11,7 @@ export default function SwapErrorAlert({ error, onDismiss }: Props) {
   if (!error) return null;
 
   return (
-    <div className='rounded-xl border border-red-400/30 bg-red-400/10 p-3 text-xs text-red-100'>
+    <div className='rounded-2xl border border-red-400/30 bg-red-400/10 p-3 text-xs text-red-100'>
       <div className='flex items-center justify-between gap-3'>
         <div>
           <div className='font-semibold text-red-200'>Swap Error</div>

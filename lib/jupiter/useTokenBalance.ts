@@ -55,8 +55,19 @@ export function useTokenBalance({
         if (!active) return;
         setBalance(undefined);
         const message = getErrorMessage(err, 'Failed to fetch token balance');
-        // Public RPC endpoints can reject token-account POST methods (403). Keep UI graceful.
-        if (message.includes('403') || message.toLowerCase().includes('forbidden')) {
+        // Public RPC endpoints often reject or throttle token-balance methods.
+        // Keep the swap UI usable by treating these as non-fatal.
+        const lower = message.toLowerCase();
+        if (
+          message.includes('403') ||
+          message.includes('429') ||
+          lower.includes('forbidden') ||
+          lower.includes('rate limit') ||
+          lower.includes('too many requests') ||
+          lower.includes('fetch failed') ||
+          lower.includes('timeout') ||
+          lower.includes('network')
+        ) {
           setError(undefined);
           return;
         }

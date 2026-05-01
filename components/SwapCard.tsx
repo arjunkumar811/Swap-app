@@ -85,11 +85,17 @@ export default function SwapCard() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className='w-full max-w-2xl'>
-      <h1 className='mb-4 text-4xl font-bold tracking-tight text-white md:text-6xl'>Swap anytime, anywhere.</h1>
-      <div className='rounded-[30px] border border-white/10 bg-[#0a0c12]/95 p-5 shadow-2xl backdrop-blur-xl'>
-        <div className='mb-4 flex items-center justify-between'><WalletButton /><SettingsPopover slippageBps={s.slippageBps} onSet={s.setSlippageBps} /></div>
-        <div className='rounded-[28px] border border-white/10 bg-[#0a0c12] p-4'>
+    <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className='w-full max-w-xl'>
+      <div className='rounded-[28px] border border-white/10 bg-white/[0.06] p-5 shadow-[0_24px_80px_rgba(7,12,25,0.65)] backdrop-blur-xl'>
+        <div className='mb-4 flex items-center justify-between'>
+          <div>
+            <div className='text-xs uppercase tracking-[0.25em] text-white/50'>Swap</div>
+            <div className='text-lg font-semibold text-white'>Instant liquidity</div>
+          </div>
+          <SettingsPopover slippageBps={s.slippageBps} onSet={s.setSlippageBps} />
+        </div>
+        <div className='mb-4'><WalletButton /></div>
+        <div className='rounded-[24px] border border-white/10 bg-black/40 p-4'>
           <AmountInput
             value={s.amount}
             onChange={s.setAmount}
@@ -99,12 +105,14 @@ export default function SwapCard() {
           />
           <TokenSelector tokens={tokens} selected={s.inputToken} onSelect={s.setInputToken} label='From' loading={searching} />
         </div>
-        <button onClick={s.flipTokens} className='relative z-10 -my-2 mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-[#12151d] shadow-[0_4px_0_0_rgba(0,0,0,0.45)] transition hover:bg-[#191d28]'><ArrowRightLeft size={20} /></button>
-        <div className='rounded-[28px] border border-white/10 bg-white/[0.08] p-4'>
+        <button onClick={s.flipTokens} className='relative z-10 -my-1 mx-auto flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-white/5 shadow-[0_6px_16px_rgba(0,0,0,0.35)] transition hover:bg-white/10'>
+          <ArrowRightLeft size={18} />
+        </button>
+        <div className='rounded-[24px] border border-white/10 bg-white/[0.08] p-4'>
           <div className='mb-2 text-3xl font-semibold text-white'>{s.loadingQuote ? 'Loading...' : outAmount}</div>
           <TokenSelector tokens={tokens} selected={s.outputToken} onSelect={s.setOutputToken} label='Buy' loading={searching} />
         </div>
-        <div className='rounded-xl border border-white/10 bg-black/20 p-3 text-xs text-muted'>
+        <div className='rounded-xl border border-white/10 bg-black/30 p-3 text-xs text-muted'>
           <div className='flex justify-between'><span>Price impact</span><PriceImpactDisplay priceImpactPct={s.quote?.priceImpactPct} loading={s.loadingQuote} /></div>
           <div className='flex justify-between'><span>Slippage</span><span>{(s.slippageBps / 100).toFixed(2)}%</span></div>
           <div className='flex justify-between'><span>Route</span><RouteDisplay quote={s.quote} loading={s.loadingQuote} /></div>

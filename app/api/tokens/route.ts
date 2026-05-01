@@ -1,5 +1,6 @@
 ﻿import { NextResponse } from 'next/server';
 import type { Token } from '@/types/token';
+import { FALLBACK_TOKENS } from '@/lib/tokens';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,7 @@ const ENDPOINTS = [
   'https://tokens.jup.ag/tokens?tags=verified',
   'https://token.jup.ag/all'
 ];
+const REQUEST_TIMEOUT_MS = 4000;
 
 function normalizeTokens(data: unknown): Token[] {
   if (Array.isArray(data)) return data as Token[];
@@ -20,16 +22,26 @@ function normalizeTokens(data: unknown): Token[] {
 
 export async function GET() {
   for (const url of ENDPOINTS) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+
     try {
-      const res = await fetch(url, { cache: 'no-store' });
+      const res = await fetch(url, {
+        cache: 'no-store',
+        signal: controller.signal,
+        headers: { Accept: 'application/json' }
+      });
       if (!res.ok) continue;
       const data = await res.json();
       const tokens = normalizeTokens(data);
       if (tokens.length > 0) return NextResponse.json(tokens);
     } catch {
       // Try next endpoint.
+    } finally {
+      clearTimeout(timeout);
     }
   }
 
-  return NextResponse.json({ error: 'Failed to fetch token list' }, { status: 502 });
+  // Keep swap usable when upstream token APIs are down.
+  return NextResponse.json(FALLBACK_TOKENS);
 }

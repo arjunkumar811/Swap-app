@@ -25,9 +25,24 @@ export type SwapError = {
   source: 'wallet' | 'quote' | 'swap' | 'tokens' | 'balance' | 'unknown';
 };
 
-export function getErrorMessage(error: unknown, fallback: string): string {
+function extractErrorMessage(error: unknown): string | undefined {
+  if (!error) return undefined;
+  if (typeof error === 'string') return error;
   if (error instanceof Error && error.message) return error.message;
-  return fallback;
+  if (typeof error === 'object' && 'message' in error && typeof (error as { message?: unknown }).message === 'string') {
+    return (error as { message: string }).message;
+  }
+  return undefined;
+}
+
+export function getErrorMessage(error: unknown, fallback: string): string {
+  if (error instanceof JupiterApiError) {
+    const detailMessage = extractErrorMessage(error.details);
+    if (detailMessage) return detailMessage;
+  }
+
+  const message = extractErrorMessage(error);
+  return message ?? fallback;
 }
 
 export function toSwapError(

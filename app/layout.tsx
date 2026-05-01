@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
-import { Sora } from 'next/font/google';
+import { Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { SolanaProviders } from '@/components/SolanaProviders';
 import { Toaster } from 'sonner';
 
-const sora = Sora({ subsets: ['latin'] });
+const spaceGrotesk = Space_Grotesk({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'Solana Jupiter Swap',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en' className='dark'>
-      <body className={sora.className}>
+      <body className={spaceGrotesk.className}>
         <SolanaProviders>
           {children}
           <Toaster richColors position='top-right' />

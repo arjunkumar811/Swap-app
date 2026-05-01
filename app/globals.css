@@ -3,12 +3,12 @@
 @tailwind utilities;
 
 :root {
-  --background: 220 24% 7%;
+  --background: 224 28% 7%;
   --foreground: 210 30% 96%;
-  --card: 220 20% 11%;
-  --border: 220 14% 22%;
-  --primary: 162 90% 54%;
-  --muted: 220 14% 63%;
+  --card: 222 24% 10%;
+  --border: 220 12% 20%;
+  --primary: 32 92% 58%;
+  --muted: 220 12% 62%;
 }
 
 * { border-color: hsl(var(--border)); }
@@ -16,15 +16,28 @@
 body {
   color: hsl(var(--foreground));
   background:
-    radial-gradient(1200px 600px at 10% -10%, rgba(20, 184, 166, 0.16), transparent 60%),
-    radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+    radial-gradient(900px 520px at 10% -10%, rgba(56, 189, 248, 0.12), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(245, 158, 11, 0.14), transparent 55%),
     hsl(var(--background));
   min-height: 100vh;
 }
 
-.nebula-bg {
+.scene-bg {
   background:
-    radial-gradient(340px 260px at 88% 34%, rgba(88, 28, 255, 0.45), transparent 60%),
-    radial-gradient(600px 300px at 10% 4%, rgba(22, 163, 74, 0.18), transparent 70%),
-    linear-gradient(180deg, rgba(6, 9, 18, 0.7), rgba(4, 6, 14, 0.94));
+    radial-gradient(520px 380px at 78% 20%, rgba(56, 189, 248, 0.18), transparent 70%),
+    radial-gradient(420px 300px at 18% 10%, rgba(245, 158, 11, 0.16), transparent 70%),
+    linear-gradient(180deg, rgba(6, 10, 20, 0.6), rgba(4, 8, 18, 0.95));
+}
+
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  opacity: 0.35;
+  mask-image: radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.9), transparent 65%);
+}
+
+.glow-orb {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.25), rgba(56, 189, 248, 0.06), transparent 60%);
 }
