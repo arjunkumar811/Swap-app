@@ -12,6 +12,7 @@ import TokenSelector from './swap/TokenSelector';
 import { useTokenList } from '@/lib/jupiter/useTokenList';
 import { useQuote } from '@/lib/jupiter/useQuote';
 import { useSwapExecution } from '@/lib/jupiter/useSwapExecution';
+import { useTokenBalance } from '@/lib/jupiter/useTokenBalance';
 import { useSwapStore } from '@/store/swapStore';
 import SwapButton from './SwapButton';
 
@@ -20,6 +21,16 @@ export default function SwapCard() {
   const { connection } = useConnection();
   const { tokens, loading: searching, error: tokenListError, inputDefault, outputDefault } = useTokenList();
   const s = useSwapStore();
+  const walletAddress = publicKey?.toBase58();
+  const {
+    balanceText: inputBalanceText,
+    loading: inputBalanceLoading,
+    error: inputBalanceError
+  } = useTokenBalance({
+    connection,
+    owner: walletAddress,
+    token: s.inputToken
+  });
   useQuote({ onError: (message) => toast.error(message) });
   const { executeSwap } = useSwapExecution({
     onSuccess: () => toast.success('Swap confirmed'),
@@ -35,6 +46,9 @@ export default function SwapCard() {
   useEffect(() => {
     if (tokenListError) toast.error(tokenListError);
   }, [tokenListError]);
+  useEffect(() => {
+    if (inputBalanceError) toast.error(inputBalanceError);
+  }, [inputBalanceError]);
 
   const outAmount = useMemo(() => {
     if (!s.quote || !s.outputToken) return '--';
@@ -56,7 +70,13 @@ export default function SwapCard() {
       <div className='rounded-[30px] border border-white/10 bg-[#0a0c12]/95 p-5 shadow-2xl backdrop-blur-xl'>
         <div className='mb-4 flex items-center justify-between'><WalletButton /><SettingsPopover slippageBps={s.slippageBps} onSet={s.setSlippageBps} /></div>
         <div className='rounded-[28px] border border-white/10 bg-[#0a0c12] p-4'>
-          <AmountInput value={s.amount} onChange={s.setAmount} label='Sell' />
+          <AmountInput
+            value={s.amount}
+            onChange={s.setAmount}
+            label='Sell'
+            balanceText={inputBalanceText}
+            balanceLoading={inputBalanceLoading}
+          />
           <TokenSelector tokens={tokens} selected={s.inputToken} onSelect={s.setInputToken} label='From' loading={searching} />
         </div>
         <button onClick={s.flipTokens} className='relative z-10 -my-2 mx-auto flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-[#12151d] shadow-[0_4px_0_0_rgba(0,0,0,0.45)] transition hover:bg-[#191d28]'><ArrowRightLeft size={20} /></button>
