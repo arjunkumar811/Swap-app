@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 220 24% 7%;
+  --foreground: 210 30% 96%;
+  --card: 220 20% 11%;
+  --border: 220 14% 22%;
+  --primary: 162 90% 54%;
+  --muted: 220 14% 63%;
+}
+
+* { border-color: hsl(var(--border)); }
+
+body {
+  color: hsl(var(--foreground));
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(20, 184, 166, 0.16), transparent 60%),
+    radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.12), transparent 55%),
+    hsl(var(--background));
+  min-height: 100vh;
+}
+
+.nebula-bg {
+  background:
+    radial-gradient(340px 260px at 88% 34%, rgba(88, 28, 255, 0.45), transparent 60%),
+    radial-gradient(600px 300px at 10% 4%, rgba(22, 163, 74, 0.18), transparent 70%),
+    linear-gradient(180deg, rgba(6, 9, 18, 0.7), rgba(4, 6, 14, 0.94));
+}
