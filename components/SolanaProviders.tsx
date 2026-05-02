@@ -1,6 +1,6 @@
 'use client';
 
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, createElement, useMemo, type ComponentType } from 'react';
 import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
 import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
@@ -24,11 +24,13 @@ export function SolanaProviders({ children }: { children: ReactNode }) {
     return adapters;
   }, []);
 
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
+  return createElement(
+    ConnectionProvider as unknown as ComponentType<{ endpoint: string; children?: ReactNode }>,
+    { endpoint },
+    createElement(
+      WalletProvider as unknown as ComponentType<{ wallets: WalletAdapter[]; autoConnect: boolean; children?: ReactNode }>,
+      { wallets, autoConnect: true },
+      createElement(WalletModalProvider, null, children)
+    )
   );
 }

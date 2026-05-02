@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import AmountInput from './AmountInput';
 import WalletButton from './WalletButton';
 import SettingsPopover from './SettingsPopover';
-import TokenSelector from './swap/TokenSelector';
+import TokenSelector from './TokenSelector';
 import PriceImpactDisplay from './swap/PriceImpactDisplay';
 import RouteDisplay from './swap/RouteDisplay';
 import TransactionStatus from './swap/TransactionStatus';
