@@ -51,6 +51,8 @@ export default function SwapCard() {
   const { tokens, error: tokenListError, inputDefault, outputDefault } = useTokenList();
   const walletAddress = publicKey?.toBase58();
 
+  const [mounted, setMounted] = useState(false);
+
   const [selectorOpen, setSelectorOpen] = useState(false);
   const [selectorSide, setSelectorSide] = useState<'input' | 'output'>('input');
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -79,6 +81,10 @@ export default function SwapCard() {
   });
 
   const { executeSwap } = useSwapExecution();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (!inputDefault || !outputDefault) return;
@@ -188,7 +194,7 @@ export default function SwapCard() {
           </div>
 
           <div className='mb-4 rounded-2xl border border-white/10 bg-black/40 p-3'>
-            {connected && walletAddress ? (
+            {mounted && connected && walletAddress ? (
               <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
                 <div className='flex items-center gap-3'>
                   <div className='flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/5'>
@@ -243,7 +249,17 @@ export default function SwapCard() {
                   <div className='text-sm font-semibold text-white'>Connect your wallet</div>
                   <div className='text-xs text-white/50'>Select a wallet to start swapping.</div>
                 </div>
-                <WalletMultiButton className='!h-11 !rounded-2xl !bg-white/10 !px-4 !text-sm hover:!bg-white/20' />
+                {mounted ? (
+                  <WalletMultiButton className='!h-11 !rounded-2xl !bg-white/10 !px-4 !text-sm hover:!bg-white/20' />
+                ) : (
+                  <button
+                    type='button'
+                    className='h-11 rounded-2xl bg-white/10 px-4 text-sm text-white/80'
+                    disabled
+                  >
+                    Connect wallet
+                  </button>
+                )}
               </div>
             )}
           </div>
